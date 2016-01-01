@@ -187,27 +187,26 @@ void scan_ubi_partitions(int mtd)
 	mtd_info = &nand->mtd_info[mtd];
 	LIST_INIT(&mtd_info->ubi_partitions);
 
-	/*
-	 * The program is called directly after a boot,
-	 * and a detach is not required. However,
-	 * detaching at the beginning allows consecutive
-	 * start of the program itself
-	 */
-	ubi_detach_mtd(libubi, DEFAULT_CTRL_DEV, mtd);
-
-	mtd_info->req.dev_num = UBI_DEV_NUM_AUTO;
-	mtd_info->req.mtd_num = mtd;
-#if defined(CONFIG_UBIVIDOFFSET)
-	mtd_info->req.vid_hdr_offset = CONFIG_UBIVIDOFFSET;
-#else
-	mtd_info->req.vid_hdr_offset = 0;
-#endif
-	mtd_info->req.mtd_dev_node = NULL;
-
-	err = ubi_attach(libubi, DEFAULT_CTRL_DEV, &mtd_info->req);
+	err = mtd_num2ubi_dev(libubi, mtd, &(mtd_info->req.dev_num));
 	if (err) {
-		TRACE("cannot attach mtd%d - maybe not a NAND or raw device", mtd);
-		return;
+
+		TRACE("MTD is not attached to a UBI, attaching");
+
+		mtd_info->req.dev_num = UBI_DEV_NUM_AUTO;
+		mtd_info->req.mtd_num = mtd;
+#if defined(CONFIG_UBIVIDOFFSET)
+		mtd_info->req.vid_hdr_offset = CONFIG_UBIVIDOFFSET;
+#else
+		mtd_info->req.vid_hdr_offset = 0;
+#endif
+		mtd_info->req.mtd_dev_node = NULL;
+
+		err = ubi_attach(libubi, DEFAULT_CTRL_DEV, &mtd_info->req);
+		if (err) {
+			TRACE("cannot attach mtd%d - maybe not a NAND or raw device", mtd);
+			return;
+		}
+
 	}
 
 	err = ubi_get_dev_info1(libubi, mtd_info->req.dev_num, &mtd_info->dev_info);

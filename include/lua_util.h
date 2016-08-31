@@ -29,6 +29,8 @@
 #include "lualib.h"
 #include "util.h"
 
+#include "../luacompat/lua-compat-5.3/compat-5.3.h"
+
 void LUAstackDump (lua_State *L);
 int run_lua_script(char *script, char *function, char *parms);
 void image2table(lua_State* L, struct img_type *img);

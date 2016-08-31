@@ -97,6 +97,7 @@ ifneq ($(CONFIG_LUA),)
 LDFLAGS_swupdate += -Wl,-E
 $(eval $(call pkg_check_modules, LUABUILD, ${CONFIG_LUAPKG}))
 KBUILD_CFLAGS += $(LUABUILD_CFLAGS)
+KBUILD_CFLAGS += -DCOMPAT53_PREFIX=lua
 KBUILD_LIBS += $(LUABUILD_LIBS)
 LDLIBS += $(LUABUILD_LDLIBS)
 endif
